@@ -1,3 +1,5 @@
+const db =require("./db");
+
 // Function to count letters in a text
 function countLetters(text){
     if(!text)
@@ -7,20 +9,18 @@ function countLetters(text){
 }
 
 // Function to retrieve text of a specific surah and verse
-function getText (surahNumber,verseNumber)  {
-    const query = "SELECT text FROM quran.ayahs WHERE surah_id = ? AND number_in_surha = ?";
-    db.query(query, [surahNumber, verseNumber], (err, results) => {
+function getText (surah,ayaNumber)  {
+    db.query('SELECT text FROM ayahs WHERE surah_id = ? AND number_in_surah = ? ', [surah, ayaNumber], (err, results) => {
         if (err) {
             return err;
         } else {
-            return {results};
+            return results;
         }
     });
 };
 
 function getSurhaText (surahNumber)  {
-    const query = "SELECT text FROM quran.ayahs WHERE surah_id = ?";
-    db.query(query, surahNumber, (err, results) => {
+    db.query('SELECT text FROM quran.ayahs WHERE surah_id = ?', surahNumber, (err, results) => {
         if (err) {
             return err;
         } else {
@@ -32,8 +32,7 @@ function getSurhaText (surahNumber)  {
 
 //get text from quran
 function getQuranText ()  {
-    const query = "SELECT text FROM quran.ayahs";
-    db.query(query, (err, results) => {
+    db.query('SELECT text FROM quran.ayahs', (err, results) => {
         if (err) {
             return err;
         } else {
