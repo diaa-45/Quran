@@ -91,39 +91,38 @@ const countLetterForQuran=async(req,res)=>{
         res.json('Error counting letters in Quran:', error);
     }
 }
-/********      test succesfully with english word ,, arabic under test   **********/ 
+/********      test succesfully with english word ,, arabic under test (done perfect)   **********/ 
 const getOccurrenc = async (req, res) => {
     try {
         const { text, word } = req.body;
-        
-        // Escape special characters in the word to avoid issues in regex
-        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        
-        // Create a regular expression with word boundaries and global flag
-        // \p{L} matches any kind of letter from any language (Unicode property escapes)
-        const regex = new RegExp(`\\b${escapedWord}\\b`, 'giu');
-        
-        // Use match method to find all occurrences of the word in the text
+        const regex = new RegExp(word, 'gi');
         const result = text.match(regex);
-
-        // Count the number of occurrences
-        const count = result ? result.length : 0;
-        
-        res.json({ count });
+        const count =result.length;
+        res.json({result,count});
     } catch (error) {
         res.json({ error });
     }
 }
 
+/********      test succesfully with english word ,, arabic under test (done perfect)   **********/ 
 
 const getOccurrencInQuran=async(req,res)=>{
-    const word=req.body.word;
+   
     try {
-        const text =  getQuranText();
-        const count = countOccurrences(text, word);
-        res.json({count});
+        db.query('SELECT text FROM quran.ayahs', (err, results) => {
+            if (err) {
+                res.json({err});
+            } else {
+                const word=req.body.word;
+                const text = results.map(result => result.text).join(' & ');
+                const result = text.match(new RegExp(word, 'gi'));
+                const count =result.length;
+                res.json({result,count});
+            }
+        });
+       
     } catch (error) {
-       res.json('Error counting occurrences in Quran:', error);
+        res.json({ error });
     }
 }
 
