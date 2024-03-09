@@ -131,27 +131,59 @@ const getOccurrenc = async (req, res) => {
     }
 }
 
-/********      test succesfully with english word ,, arabic under test (done perfect)   **********/ 
+/********      arabic under test done perfect ( Tashkil under test )   **********/ 
 
 const getOccurrencInQuran=async(req,res)=>{
    
     try {
-        db.query('SELECT text FROM quran.ayahs', (err, results) => {
+        db.query('SELECT text FROM quran.ayahs ', (err, results) => {
+            
             if (err) {
                 res.json({err});
             } else {
+
                 const word=req.body.word;
-                const text = results.map(result => result.text).join(' & ');
-                const result = text.match(new RegExp(word, 'gi'));
-                const count =result.length;
-                res.json({result,count});
+                // دالة للتحقق مما إذا كانت الآية تحتوي على "الرحمن" بالتشكيل
+                function hasTashkeel(verse) {
+                    return verse.includes(word);
+                }
+        
+                // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
+                const versesWithTashkeel = results.filter(result => hasTashkeel(result.text));
+                const count =versesWithTashkeel.length;
+                res.json({versesWithTashkeel,count});
             }
         });
        
     } catch (error) {
         res.json({ error });
     }
-}
+} 
+
+
+
+
+/* const getOccurrencInQuran = async (req, res) => {
+    try {
+        const searchText = req.body.word
+
+        // Construct the SQL query to search for the stripped text
+        const query = "SELECT * FROM quran.ayahs WHERE text LIKE ?";
+        const searchTextWithWildcards = "%" + searchText + "%";
+
+        db.query(query, [searchTextWithWildcards], (err, results) => {
+            if (err) {
+                console.error("Error occurred while searching:", err);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+            res.json({ results });
+        });
+    } catch (error) {
+        console.error("Error occurred while searching:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+} */
+
 
 
 module.exports={
