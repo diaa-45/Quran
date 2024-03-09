@@ -160,32 +160,6 @@ const getOccurrencInQuran=async(req,res)=>{
     }
 } 
 
-
-
-
-/* const getOccurrencInQuran = async (req, res) => {
-    try {
-        const searchText = req.body.word
-
-        // Construct the SQL query to search for the stripped text
-        const query = "SELECT * FROM quran.ayahs WHERE text LIKE ?";
-        const searchTextWithWildcards = "%" + searchText + "%";
-
-        db.query(query, [searchTextWithWildcards], (err, results) => {
-            if (err) {
-                console.error("Error occurred while searching:", err);
-                return res.status(500).json({ error: "Internal Server Error" });
-            }
-            res.json({ results });
-        });
-    } catch (error) {
-        console.error("Error occurred while searching:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-} */
-
-
-
 module.exports={
     getcountLetter,
     getAyaText,
