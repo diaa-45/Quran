@@ -6,7 +6,7 @@ const getcountLetter=async(req,res)=>{
     try {
         const text = req.body.text;
         const count = text.length;
-        res.json({count})
+        res.json({count,text})
     } catch (error) {
         res.json({error})
     }
@@ -20,7 +20,7 @@ const getAyaText = async (req, res) => {
             if (err) {
                 res.json({err});
             } else {
-                res.json({ results });;
+                res.json({  surah_id, number_in_surah, results});;
             }
         });
         
@@ -36,8 +36,8 @@ const getSurahAyas=async(req,res)=>{
         if (err) {
             res.json({err});
         } else {
-            const text = results.map(result => result.text).join(' ');
-            res.json({text});
+            const text = results.map(result => result.text).join(' & ');
+            res.json({surah,text});
         }
     });
 }

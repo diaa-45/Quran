@@ -1,58 +1,4 @@
-/*const db =require("./db")
-
-
-let data = {};
-
-files.forEach(file => {
-    data[file.replace('.json', '')] = JSON.parse(fs.readFileSync(file, 'utf-8'));
-});
-
-
-// Function to calculate the sum of letter values in the verse according to the method
-function calculateVerseSum(verse, method) {
-    let sum = 0;
-    const methodData = data[method];
-
-    for (let i = 0; i < verse.length; i++) {
-        const letter = verse[i];
-        const value = methodData[letter];
-        if (value) {
-            sum += value;
-        }
-    }
-
-    return sum;
-}
-
-// Controller function to count the verse
-const countVerse = async(req, res)=> {
-    const { surah, ayah ,method} = req.body;
-
-    // Fetch the verse based on surah and ayah
-    try {
-        db.query('SELECT text FROM ayahs WHERE surah_id = ? AND number_in_surah = ? ', [surah, ayah], (err, results) => {
-            if (err) {
-                res.json({err});
-            } else {
-                const sum =  calculateVerseSum(db.results, method);
-                res.json({method, surah, ayah , results ,sum});
-            }
-        });
-        
-    } catch (err) {
-        console.error("Error:", err);
-        res.json({ error: "An error occurred while fetching text." });
-    }
-
-
-    // Calculate the sum of letter values in the verse according to the method
-
-    //res.json({ method, surah, ayah });
-}
-
- */
-
-
+const db =require("./db")
 
 
 
@@ -111,34 +57,60 @@ function calculateWordValue(word, method) {
 
 // دالة لحساب قيمة الجملة بناءً على حساب كل كلمة فيها
 function calculateSentenceValue(sentence, method) {
-    const words = sentence.split(" ");
-    let sentenceValue = 0;
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        const wordValue = calculateWordValue(word, method);
-        sentenceValue += wordValue;
-        console.log(wordValue,word);
+
+        const words = sentence.split(" ");
+        let sentenceValue = 0;
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            const wordValue = calculateWordValue(word, method);
+            sentenceValue += wordValue;
+            console.log(wordValue,word);
+        }
+        return sentenceValue+1 ;
     }
-    return sentenceValue+1 ;
-}
 
 
 
 // راوت للحصول على مجموع عدد الحروف بالطريقة المحددة
 const countVerse =async (req, res) => {
     const method = req.params.method;
-    const sentence = req.body.sentence; // جملة البحث
+    //const sentence = req.body.sentence; // جملة البحث
+    const { surah, ayah } = req.body;
 
-    if (!method || !valuesByKey["أ"][method]) {
+    // Fetch the verse based on surah and ayah
+    try {
+        db.query('SELECT text FROM ayahs WHERE surah_id = ? AND number_in_surah = ? ', [surah, ayah], (err, results) => {
+            if (err) {
+                res.json({err});
+            } else {
+                if (!method || !valuesByKey["أ"][method]) {
+                    return res.status(400).json({ error: 'Invalid method' });
+                }
+                if (results.length === 0) {
+                    return res.status(404).json({ error: 'Ayah not found' });
+                }
+        
+                const ayahText = results[0].text;
+                
+                const totalSum = calculateSentenceValue(ayahText, method);
+                res.json({ method, totalSum ,ayahText});
+            }
+        });
+        
+    } catch (err) {
+        console.error("Error:", err);
+        res.json({ error: "An error occurred while fetching text." });
+    }
+   /*  if (!method || !valuesByKey["أ"][method]) {
         return res.status(400).json({ error: 'Invalid method' });
-    }
+    } */
 
-    if (!sentence) {
+    /* if (!sentence) {
         return res.status(400).json({ error: 'Sentence is required' });
-    }
+    } */
 
-    const totalSum = calculateSentenceValue(sentence, method);
-    res.json({ method, totalSum });
+    //const totalSum = calculateSentenceValue(sentence, method);
+    //res.json({ method, totalSum });
 };
 
 module.exports = {
