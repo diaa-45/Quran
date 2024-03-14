@@ -1,11 +1,15 @@
-//import services
-const {countLetters}=require("./services")
+
 const db =require("./db")
 
 /********      test succesfully   **********/ 
 const getcountLetter=async(req,res)=>{
-    const count=await countLetters(req.body.text);
-    res.json({count})
+    try {
+        const text = req.body.text;
+        const count = text.length;
+        res.json({count})
+    } catch (error) {
+        res.json({error})
+    }
 
 }
 /********      test succesfully   **********/ 
