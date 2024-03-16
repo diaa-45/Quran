@@ -140,7 +140,8 @@ const getOccurrenc = async (req, res) => {
 const getOccurrencInQuran=async(req,res)=>{
    
     try {
-        db.query('SELECT text FROM quran.ayahs ', (err, results) => {
+        db.query(`SELECT text ,name_arab AS Surah , number_in_surah AS Ayah_Number 
+                FROM quran.ayahs INNER JOIN surah ON ayahs.surah_id = surah.id `, (err, results) => {
             
             if (err) {
                 res.json({err});
@@ -153,9 +154,10 @@ const getOccurrencInQuran=async(req,res)=>{
                 }
         
                 // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
-                const versesWithTashkeel = results.filter(result => hasTashkeel(result.text));
-                const count =versesWithTashkeel.length;
-                res.json({versesWithTashkeel,count});
+                const ayahSearch = results.filter(result => hasTashkeel(result.text));
+                //const surah= results[0].name_arab;
+                const count =ayahSearch.length;
+                res.json({ayahSearch,count});
             }
         });
        
