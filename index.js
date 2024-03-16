@@ -10,6 +10,9 @@ app.use(express.json());
 
 // Routes
 app.use('/quran', quranRoutes);
+app.use('*', (req,res)=>{
+    res.send("This Route isn’t Valid , Please Use a Valid Route ")
+});
 
 // Start the server
 app.listen(PORT, () => {

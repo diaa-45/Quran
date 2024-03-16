@@ -6,7 +6,7 @@ const getcountLetter=async(req,res)=>{
     try {
         const text = req.body.text;
         const count = text.length;
-        res.json({count,text})
+        res.json({text,count})
     } catch (error) {
         res.json({error})
     }
@@ -16,11 +16,15 @@ const getcountLetter=async(req,res)=>{
 const getAyaText = async (req, res) => {
     const { surah_id, number_in_surah } = req.body;
     try {
-        db.query('SELECT text FROM ayahs WHERE surah_id = ? AND number_in_surah = ? ', [surah_id, number_in_surah], (err, results) => {
+        db.query(`SELECT text,name_arab As Surah,number_in_surah As Ayah_Number FROM ayahs INNER JOIN surah 
+                ON ayahs.surah_id = surah.id WHERE surah_id = ? AND number_in_surah = ? `, [surah_id, number_in_surah], (err, results) => {
             if (err) {
                 res.json({err});
             } else {
-                res.json({  surah_id, number_in_surah, results});;
+                const Ayah_Text =results[0].text;
+                const Surah =results[0].Surah;
+                const Ayah_Number =results[0].Ayah_Number;
+                res.json({  Surah, Ayah_Number,Ayah_Text});;
             }
         });
         
@@ -32,23 +36,27 @@ const getAyaText = async (req, res) => {
 /********      test succesfully   **********/ 
 const getSurahAyas=async(req,res)=>{
     const surah =req.body.surah;
-    db.query('SELECT text FROM quran.ayahs WHERE surah_id = ?', surah, (err, results) => {
+    db.query(`SELECT text, name_arab As Surah,number_in_surah As Ayah_Number 
+            FROM ayahs INNER JOIN surah ON ayahs.surah_id = surah.id WHERE surah_id = ?`, surah, (err, results) => {
         if (err) {
             res.json({err});
         } else {
-            const text = results.map(result => result.text).join(' & ');
-            res.json({surah,text});
+            const Ayahs = results.map(result => (result.text+`(${result.Ayah_Number})`)).join(' & ');
+            const Surah =results[0].Surah;
+
+            res.json({Surah,Ayahs});
         }
     });
 }
 /********      test succesfully   **********/ 
 const getTextForQuran=async(req,res)=>{
-    db.query('SELECT text FROM quran.ayahs', (err, results) => {
+    db.query(`SELECT text,name_arab As Surah,number_in_surah As Ayah_Number 
+            FROM ayahs INNER JOIN surah ON ayahs.surah_id = surah.id`, (err, results) => {
         if (err) {
             res.json({err});
         } else {
-            const text = results.map(result => result.text).join(' & ');
-            res.json({text}) ;
+            //const text = results.map(result => result.text).join(' & ');
+            res.json({results}) ;
         }
     });
 
@@ -69,8 +77,9 @@ const countLetterForAya = async (req, res) => {
             for (const result of results) {
                 totalLetters += result.text.length;
             }
+            const ayah=results[0].text
             
-            res.json({ totalLetters, results });
+            res.json({ayah, totalLetters});
         });
     } catch (err) {
         console.error("Error:", err);
@@ -81,7 +90,8 @@ const countLetterForAya = async (req, res) => {
 const countLetterForSurah=async(req,res)=>{
     const surah=req.body.surah;
     try {
-        db.query('SELECT text FROM ayahs WHERE surah_id = ? ', [surah], async (err, results) => {
+        db.query(`SELECT text ,name_arab As Surah FROM ayahs INNER JOIN surah ON ayahs.surah_id = surah.id
+                 WHERE surah_id = ? `, [surah], async (err, results) => {
             if (err) {
                 console.error("Database error:", err);
                 res.status(500).json({ error: "An error occurred while fetching text." });
@@ -103,7 +113,7 @@ const countLetterForSurah=async(req,res)=>{
 
 const countLetterForQuran=async(req,res)=>{
     try {
-        db.query('SELECT text FROM ayahs ', async (err, results) => {
+        db.query('SELECT text , name_arab FROM ayahs INNER JOIN surah ON ayahs.surah_id = surah.id', async (err, results) => {
             if (err) {
                 console.error("Database error:", err);
                 res.status(500).json({ error: "An error occurred while fetching text." });
@@ -127,9 +137,8 @@ const getOccurrenc = async (req, res) => {
     try {
         const { text, word } = req.body;
         const regex = new RegExp(word, 'gi');
-        const result = text.match(regex);
-        const count =result.length;
-        res.json({result,count});
+        const count =text.match(regex).length;
+        res.json({text,word,count});
     } catch (error) {
         res.json({ error });
     }
@@ -157,7 +166,7 @@ const getOccurrencInQuran=async(req,res)=>{
                 const ayahSearch = results.filter(result => hasTashkeel(result.text));
                 //const surah= results[0].name_arab;
                 const count =ayahSearch.length;
-                res.json({ayahSearch,count});
+                res.json({count,ayahSearch});
             }
         });
        

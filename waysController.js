@@ -79,7 +79,8 @@ const countVerse =async (req, res) => {
 
     // Fetch the verse based on surah and ayah
     try {
-        db.query('SELECT text FROM ayahs WHERE surah_id = ? AND number_in_surah = ? ', [surah, ayah], (err, results) => {
+        db.query(`SELECT text,name_arab As Surah FROM ayahs INNER JOIN surah 
+                ON ayahs.surah_id = surah.id WHERE surah_id = ? AND number_in_surah = ? `, [surah, ayah], (err, results) => {
             if (err) {
                 res.json({err});
             } else {
@@ -91,9 +92,10 @@ const countVerse =async (req, res) => {
                 }
         
                 const ayahText = results[0].text;
+                const Surah = results[0].Surah;
                 
                 const totalSum = calculateSentenceValue(ayahText, method);
-                res.json({ method, totalSum ,ayahText});
+                res.json({ "طريقة البحث":method, "مجموع العدد ":totalSum ,"نص الآية ":ayahText,"السورة":Surah});
             }
         });
         
