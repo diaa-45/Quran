@@ -102,8 +102,8 @@ const countLetterForSurah=async(req,res)=>{
             for (const result of results) {
                 totalLetters += result.text.length;
             }
-            
-            res.json({ totalLetters, results });
+            const surah=results[0].Surah
+            res.json({ totalLetters, surah });
         });
     } catch (error) {
         res.json('Error counting letters in Surah:', error);
@@ -124,7 +124,6 @@ const countLetterForQuran=async(req,res)=>{
             for (const result of results) {
                 totalLetters += result.text.length;
             }
-            
             res.json({ totalLetters, results });
         });
     } catch (error) {
@@ -166,7 +165,7 @@ const getOccurrencInQuran=async(req,res)=>{
                 const ayahSearch = results.filter(result => hasTashkeel(result.text));
                 //const surah= results[0].name_arab;
                 const count =ayahSearch.length;
-                res.json({count,ayahSearch});
+                res.json({"عدد النتائج": count,"النتائج": ayahSearch});
             }
         });
        
@@ -174,6 +173,43 @@ const getOccurrencInQuran=async(req,res)=>{
         res.json({ error });
     }
 } 
+
+// ********* Search About Ayahs In Specific Surah  *********//
+const searchInSurah=async(req,res)=>{
+   
+    try {
+        db.query(`SELECT text ,name_arab AS Surah , number_in_surah AS Ayah_Number , surah_id 
+                FROM quran.ayahs INNER JOIN surah ON ayahs.surah_id = surah.id `, (err, results) => {
+            
+            if (err) {
+                res.json({err});
+            } else {
+                const {id} = req.params;
+                const word=req.body.word;
+                // دالة للتحقق مما إذا كانت الآية تحتوي على "الرحمن" بالتشكيل
+                function hasTashkeel(verse) {
+                    return verse.includes(word);
+                }
+                let array =[];
+                // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
+                const ayahSearch = results.filter(result => hasTashkeel(result.text));
+
+                for(let i=0; i<ayahSearch.length; i++){
+                    if(ayahSearch[i].surah_id==id)
+                        array.push(ayahSearch[i]);
+                
+                }
+                //const surah= results[0].name_arab;
+                const count =array.length;
+                res.json({"عدد النتائج": count,"النتائج " : array});
+            }
+        });
+       
+    } catch (error) {
+        res.json({ error });
+    }
+} 
+
 
 module.exports={
     getcountLetter,
@@ -184,5 +220,6 @@ module.exports={
     getTextForQuran,
     countLetterForQuran,
     getOccurrenc,
-    getOccurrencInQuran
+    getOccurrencInQuran,
+    searchInSurah
 }
