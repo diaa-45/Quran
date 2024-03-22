@@ -148,7 +148,7 @@ const getOccurrenc = async (req, res) => {
 const getOccurrencInQuran=async(req,res)=>{
    
     try {
-        db.query(`SELECT text ,name_arab AS Surah , number_in_surah AS Ayah_Number 
+        db.query(`SELECT text , normalized_text ,name_arab AS Surah , number_in_surah AS Ayah_Number 
                 FROM quran.ayahs INNER JOIN surah ON ayahs.surah_id = surah.id `, (err, results) => {
             
             if (err) {
@@ -162,7 +162,7 @@ const getOccurrencInQuran=async(req,res)=>{
                 }
         
                 // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
-                const ayahSearch = results.filter(result => hasTashkeel(result.text));
+                const ayahSearch = results.filter(result => hasTashkeel(result.normalized_text));
                 //const surah= results[0].name_arab;
                 const count =ayahSearch.length;
                 res.json({"عدد النتائج": count,"النتائج": ayahSearch});
@@ -178,7 +178,7 @@ const getOccurrencInQuran=async(req,res)=>{
 const searchInSurah=async(req,res)=>{
    
     try {
-        db.query(`SELECT text ,name_arab AS Surah , number_in_surah AS Ayah_Number , surah_id 
+        db.query(`SELECT text , normalized_text , name_arab AS Surah , number_in_surah AS Ayah_Number , surah_id 
                 FROM quran.ayahs INNER JOIN surah ON ayahs.surah_id = surah.id `, (err, results) => {
             
             if (err) {
@@ -192,7 +192,7 @@ const searchInSurah=async(req,res)=>{
                 }
                 let array =[];
                 // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
-                const ayahSearch = results.filter(result => hasTashkeel(result.text));
+                const ayahSearch = results.filter(result => hasTashkeel(result.normalized_text));
 
                 for(let i=0; i<ayahSearch.length; i++){
                     if(ayahSearch[i].surah_id==id)
