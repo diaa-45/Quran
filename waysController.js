@@ -67,7 +67,7 @@ function calculateSentenceValue(sentence, method) {
             console.log(wordValue,word);
         }
         return sentenceValue+1 ;
-    }
+}
 
 
 
