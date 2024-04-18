@@ -159,12 +159,16 @@ const getOccurrencInQuran=async(req,res)=>{
                 const word=req.body.word;
                 // دالة للتحقق مما إذا كانت الآية تحتوي على "الرحمن" بالتشكيل
                 function hasTashkeel(verse) {
-                    return verse.includes(word);
-                }
+                    return verse.text.includes(word) || verse.normalized_text.includes(word);
+                  }                  
         
                 // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
-                const ayahSearch = results.filter(result => hasTashkeel(result.normalized_text));
-                //const surah= results[0].name_arab;
+                const ayahSearch = results.filter(result => {
+                    const regex = new RegExp(word, "gi"); // 'g' for global search, 'i' for case-insensitive
+                    return regex.test(result.text) || regex.test(result.normalized_text);
+                  });
+                  
+                
                 const count =ayahSearch.length;
                 res.json({"عدد النتائج": count,"النتائج": ayahSearch});
             }
@@ -193,7 +197,10 @@ const searchInSurah=async(req,res)=>{
                 }
                 let array =[];
                 // تصفية الآيات التي تحتوي على "الرحمن" بالتشكيل
-                const ayahSearch = results.filter(result => hasTashkeel(result.normalized_text));
+                const ayahSearch = results.filter(result =>{ 
+                    const regex = new RegExp(word, "gi"); 
+                    return regex.test(result.text) || regex.test(result.normalized_text);
+                });
 
                 for(let i=0; i<ayahSearch.length; i++){
                     if(ayahSearch[i].surah_id==id)
