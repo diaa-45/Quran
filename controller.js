@@ -119,13 +119,13 @@ const countLetterForQuran=async(req,res)=>{
                 res.status(500).json({ error: "An error occurred while fetching text." });
                 return;
             }
-            
+            let arr =[]
             let totalLetters = 0;
             for (const result of results) {
                 totalLetters += result.normalized_text.length;
+                arr.push(result.name_arab);
             }
-            const surah=results[0].name_arab;
-            res.json({ totalLetters, surah });
+            res.json({ totalLetters, arr });
         });
     } catch (error) {
         res.json({error})
