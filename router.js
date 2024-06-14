@@ -14,6 +14,7 @@ router.get('/countLetterInAya', quranController.countLetterForAya);
 router.get('/countLetterInSurah', quranController.countLetterForSurah);
 router.get('/countLetterInQuran', quranController.countLetterForQuran);
 router.get('/countOccurrencesInSentence', quranController.getOccurrenc);
+router.get('/calculateOccurrences/:surah/:ayah', quranController.calculateOccurrences);
 
 // Search Routers 1) global  2) In Specific Surah
 

@@ -1,7 +1,5 @@
 const db =require("./db")
 
-
-
 // قيمة كل حرف في اللغة العربية بحسب كل طريقة
 const valuesByKey = {
     "أ": { "arrangOfLetters": 1, "minorSentences": 1, "middleSentences": 1, "bigSentences": 1, "mostRepeatedLetters": 1, "appearanceOfLetters": 4 },
